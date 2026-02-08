@@ -3,6 +3,7 @@ package com.example.inventory.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "categories")
@@ -19,5 +20,6 @@ public class Category {
 
     // This shows the "One-to-Many" relationship: One category has many products
     @OneToMany(mappedBy = "category")
+    @JsonIgnore
     private List<Product> products;
 }
