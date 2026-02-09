@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.inventory.service.InventoryService;
-
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
@@ -28,5 +28,15 @@ public class ProductController {
     @GetMapping("/low-stock")
     public List<Product> getLowStock() {
         return inventoryService.getLowStockProducts();
+    }
+
+    // New POST endpoint to update stock
+    @PostMapping("/{id}/stock")
+    public Product updateStock(
+            @PathVariable Long id,
+            @RequestParam int amount,
+            @RequestParam String type,
+            @RequestParam String reason) {
+        return inventoryService.updateStock(id, amount, type, reason);
     }
 }

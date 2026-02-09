@@ -13,12 +13,17 @@ public class StockTransaction {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    private Integer changeAmount; // Positive for additions, negative for sales
+    @Column(name = "change_amount")
+    private Integer changeAmount;
 
-    private String transactionType; // e.g., "PURCHASE", "SALE"
+    @Column(name = "transaction_type")
+    private String transactionType;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private String reason;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 }
