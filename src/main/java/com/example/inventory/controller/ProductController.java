@@ -5,6 +5,7 @@ import com.example.inventory.repository.ProductRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.inventory.service.InventoryService;
 
 import java.util.List;
 
@@ -12,16 +13,20 @@ import java.util.List;
 @RequestMapping("/api/products")
 public class ProductController {
 
-    private final ProductRepository productRepository;
+    private final InventoryService inventoryService;
 
-    // Dependency Injection: IntelliJ will automatically provide the repository
-    public ProductController(ProductRepository productRepository) {
-        this.productRepository = productRepository;
+    public ProductController(InventoryService inventoryService) {
+        this.inventoryService = inventoryService;
     }
 
-    // This handles GET requests to http://localhost:8080/api/products
     @GetMapping
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return inventoryService.getAllProducts();
+    }
+
+    // New endpoint for alerts!
+    @GetMapping("/low-stock")
+    public List<Product> getLowStock() {
+        return inventoryService.getLowStockProducts();
     }
 }
