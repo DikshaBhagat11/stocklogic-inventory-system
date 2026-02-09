@@ -1,6 +1,7 @@
 package com.example.inventory.controller;
 
 import com.example.inventory.model.Product;
+import com.example.inventory.model.StockTransaction;
 import com.example.inventory.repository.ProductRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,5 +39,10 @@ public class ProductController {
             @RequestParam String type,
             @RequestParam String reason) {
         return inventoryService.updateStock(id, amount, type, reason);
+    }
+
+    @GetMapping("/transactions")
+    public List<StockTransaction> getTransactionHistory() {
+        return inventoryService.getTransactionHistory();
     }
 }

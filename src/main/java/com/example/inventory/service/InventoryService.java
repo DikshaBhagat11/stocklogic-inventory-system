@@ -52,4 +52,8 @@ public class InventoryService {
 
         return product;
     }
+
+    public List<StockTransaction> getTransactionHistory() {
+        return transactionRepository.findAll();
+    }
 }
