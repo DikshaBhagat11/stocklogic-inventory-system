@@ -6,20 +6,24 @@
     <title>StockLogic Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .low-stock { background-color: #ffcccc; color: #cc0000; font-weight: bold; }
+        .low-stock { background-color: #fff1f1; border-left: 5px solid #dc3545; }
+        .table-hover tbody tr:hover { background-color: #f8f9fa; }
     </style>
 </head>
 <body class="bg-light">
 <div class="container mt-5">
-    <h1 class="mb-4">📦 StockLogic Inventory</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📦 StockLogic Inventory</h1>
+        <button class="btn btn-outline-secondary btn-sm" onclick="loadProducts()">🔄 Refresh Data</button>
+    </div>
 
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Current Inventory</h5>
+            <h5 class="mb-0">Current Inventory Status</h5>
         </div>
-        <div class="card-body">
-            <table class="table table-hover">
-                <thead>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
                 <tr>
                     <th>SKU</th>
                     <th>Product Name</th>
@@ -27,6 +31,7 @@
                     <th>Price</th>
                     <th>Quantity</th>
                     <th>Status</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody id="product-table-body">
@@ -37,28 +42,73 @@
 </div>
 
 <script>
-    // Fetch data from your Spring Boot API
+    // 1. Function to load all products and display them
     async function loadProducts() {
-        const response = await fetch('/api/products');
-        const products = await response.json();
-        const tableBody = document.getElementById('product-table-body');
+        try {
+            const response = await fetch('/api/products');
+            const products = await response.json();
+            const tableBody = document.getElementById('product-table-body');
 
-        tableBody.innerHTML = products.map(p => `
-                <tr class="${p.quantity < p.minStockLevel ? 'low-stock' : ''}">
-                    <td>${p.sku}</td>
-                    <td>${p.name}</td>
-                    <td>${p.category.name}</td>
-                    <td>$${p.price.toFixed(2)}</td>
-                    <td>${p.quantity}</td>
-                    <td>
-                        ${p.quantity < p.minStockLevel
-            ? '<span class="badge bg-danger">Low Stock</span>'
-            : '<span class="badge bg-success">Healthy</span>'}
-                    </td>
-                </tr>
-            `).join('');
+            tableBody.innerHTML = products.map(p => {
+                const isLow = p.quantity < p.minStockLevel;
+                return `
+                    <tr class="${isLow ? 'low-stock' : ''}">
+                        <td class="align-middle"><code>${p.sku}</code></td>
+                        <td class="align-middle"><strong>${p.name}</strong></td>
+                        <td class="align-middle">${p.category.name}</td>
+                        <td class="align-middle">$${p.price.toFixed(2)}</td>
+                        <td class="align-middle">${p.quantity}</td>
+                        <td class="align-middle">
+                            ${isLow
+                    ? '<span class="badge bg-danger">Low Stock</span>'
+                    : '<span class="badge bg-success">Healthy</span>'}
+                        </td>
+                        <td class="align-middle">
+                            <button class="btn btn-sm btn-success" onclick="restock(${p.id}, this)">
+                                +10 Restock
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        } catch (error) {
+            console.error("Error loading products:", error);
+        }
     }
 
+    // 2. Function to call the POST endpoint and update stock
+    async function restock(productId, button) {
+        // Disable button briefly so user doesn't double-click
+        button.disabled = true;
+        button.innerText = "Saving...";
+
+        const amount = 10;
+        const type = 'RESTOCK';
+        const reason = 'Dashboard Quick Restock';
+
+        // Construct the URL with query parameters
+        const url = `/api/products/${productId}/stock?amount=${amount}&type=${type}&reason=${encodeURIComponent(reason)}`;
+
+        try {
+            const response = await fetch(url, { method: 'POST' });
+
+            if (response.ok) {
+                // Refresh the table to show updated numbers and colors
+                await loadProducts();
+            } else {
+                alert("Restock failed. Check server logs.");
+                button.disabled = false;
+                button.innerText = "+10 Restock";
+            }
+        } catch (error) {
+            console.error("Error updating stock:", error);
+            alert("Connection error.");
+            button.disabled = false;
+            button.innerText = "+10 Restock";
+        }
+    }
+
+    // Load data immediately on page open
     loadProducts();
 </script>
 </body>
