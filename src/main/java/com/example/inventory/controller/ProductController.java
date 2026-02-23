@@ -45,4 +45,9 @@ public class ProductController {
     public List<StockTransaction> getTransactionHistory() {
         return inventoryService.getTransactionHistory();
     }
+
+    @PostMapping
+    public Product addProduct(@RequestBody Product product) {
+        return inventoryService.createProduct(product);
+    }
 }

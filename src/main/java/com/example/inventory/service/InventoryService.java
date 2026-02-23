@@ -56,4 +56,10 @@ public class InventoryService {
     public List<StockTransaction> getTransactionHistory() {
         return transactionRepository.findAll();
     }
+
+    public Product createProduct(Product product) {
+        // If no category is set, you'd handle that here,
+        // but for now, we'll assume the frontend sends a valid Category ID.
+        return productRepository.save(product);
+    }
 }
