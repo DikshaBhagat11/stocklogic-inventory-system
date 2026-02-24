@@ -21,6 +21,32 @@
         <div class="mb-3 text-end">
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">+ Add New Product</button>
         </div>
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-white shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Total Products</h6>
+                        <h2 id="stat-total-items">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-white shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Low Stock Alerts</h6>
+                        <h2 id="stat-low-stock" class="text-danger">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-white shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Total Inventory Value</h6>
+                        <h2 id="stat-total-value">$0.00</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="card-header bg-primary text-white">
             <h5 class="mb-0">Current Inventory Status</h5>
         </div>
@@ -98,6 +124,17 @@
     async function refreshAll() {
         await loadProducts();
         await loadTransactions();
+        await loadStats(); // Add this
+    }
+
+    async function loadStats() {
+        const response = await fetch('/api/products/stats');
+        const stats = await response.json();
+
+        document.getElementById('stat-total-items').innerText = stats.totalItems;
+        document.getElementById('stat-low-stock').innerText = stats.lowStockCount;
+        document.getElementById('stat-total-value').innerText =
+            new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.totalValue);
     }
 
     async function loadProducts() {

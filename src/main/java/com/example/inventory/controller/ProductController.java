@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.inventory.service.InventoryService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -49,5 +50,10 @@ public class ProductController {
     @PostMapping
     public Product addProduct(@RequestBody Product product) {
         return inventoryService.createProduct(product);
+    }
+
+    @GetMapping("/stats")
+    public Map<String, Object> getStats() {
+        return inventoryService.getInventoryStats();
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional; // Import this!
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class InventoryService {
@@ -61,5 +63,26 @@ public class InventoryService {
         // If no category is set, you'd handle that here,
         // but for now, we'll assume the frontend sends a valid Category ID.
         return productRepository.save(product);
+    }
+
+    public Map<String, Object> getInventoryStats() {
+        List<Product> products = productRepository.findAll();
+
+        long totalItems = products.size();
+        long lowStockCount = products.stream()
+                .filter(p -> p.getQuantity() < p.getMinStockLevel())
+                .count();
+        double totalValue = products.stream()
+                .mapToDouble(p -> p.getPrice()
+                        .multiply(java.math.BigDecimal.valueOf(p.getQuantity()))
+                        .doubleValue())
+                .sum();
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalItems", totalItems);
+        stats.put("lowStockCount", lowStockCount);
+        stats.put("totalValue", totalValue);
+
+        return stats;
     }
 }
