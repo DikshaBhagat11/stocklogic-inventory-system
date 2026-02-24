@@ -56,4 +56,18 @@ public class ProductController {
     public Map<String, Object> getStats() {
         return inventoryService.getInventoryStats();
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable Long id) {
+        inventoryService.deleteProduct(id);
+    }
+
+    @GetMapping("/export")
+    public org.springframework.http.ResponseEntity<String> exportCsv() {
+        String csv = inventoryService.getInventoryCsv();
+        return org.springframework.http.ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=inventory.csv")
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/csv"))
+                .body(csv);
+    }
 }

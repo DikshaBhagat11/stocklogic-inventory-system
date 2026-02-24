@@ -10,16 +10,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import com.example.inventory.model.Category;
+import com.example.inventory.repository.CategoryRepository;
 
 @Service
 public class InventoryService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
     private final StockTransactionRepository transactionRepository;
 
-    // Update constructor to include the new repository
-    public InventoryService(ProductRepository productRepository, StockTransactionRepository transactionRepository) {
+    // Update this constructor to include categoryRepository
+    public InventoryService(ProductRepository productRepository,
+                            CategoryRepository categoryRepository,
+                            StockTransactionRepository transactionRepository) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
         this.transactionRepository = transactionRepository;
     }
 
@@ -84,5 +90,33 @@ public class InventoryService {
         stats.put("totalValue", totalValue);
 
         return stats;
+    }
+
+    // For Delete
+    public void deleteProduct(Long id) {
+        // Note: This will fail if there are transactions linked to the product.
+        // In a real app, you'd delete transactions first or use "Soft Delete".
+        transactionRepository.findAll().stream()
+                .filter(t -> t.getProduct().getId().equals(id))
+                .forEach(transactionRepository::delete);
+        productRepository.deleteById(id);
+    }
+
+    // For Categories
+    public Category createCategory(Category category) {
+        return categoryRepository.save(category);
+    }
+
+    // For CSV Export
+    public String getInventoryCsv() {
+        StringBuilder csv = new StringBuilder();
+        csv.append("SKU,Product Name,Category,Quantity,Price,Value\n");
+
+        productRepository.findAll().forEach(p -> {
+            csv.append(String.format("%s,%s,%s,%d,%.2f,%.2f\n",
+                    p.getSku(), p.getName(), p.getCategory().getName(),
+                    p.getQuantity(), p.getPrice(), p.getPrice().doubleValue() * p.getQuantity()));
+        });
+        return csv.toString();
     }
 }

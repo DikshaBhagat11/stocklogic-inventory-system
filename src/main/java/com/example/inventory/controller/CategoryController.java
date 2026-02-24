@@ -1,0 +1,20 @@
+package com.example.inventory.controller;
+
+import com.example.inventory.model.Category;
+import com.example.inventory.service.InventoryService;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/categories")
+public class CategoryController {
+    private final InventoryService inventoryService;
+
+    public CategoryController(InventoryService inventoryService) {
+        this.inventoryService = inventoryService;
+    }
+
+    @PostMapping
+    public Category addCategory(@RequestBody Category category) {
+        return inventoryService.createCategory(category);
+    }
+}

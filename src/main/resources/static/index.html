@@ -19,6 +19,8 @@
 
     <div class="card shadow">
         <div class="mb-3 text-end">
+            <a href="/api/products/export" class="btn btn-outline-success me-2">📊 Export to CSV</a>
+            <button class="btn btn-outline-info me-2" onclick="addNewCategory()">+ New Category</button>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">+ Add New Product</button>
         </div>
         <div class="row mb-4">
@@ -154,6 +156,7 @@
                 <td class="align-middle">
                     <button class="btn btn-sm btn-success me-1" onclick="handleUpdate(${p.id}, 'RESTOCK')">Restock</button>
                     <button class="btn btn-sm btn-danger" onclick="handleUpdate(${p.id}, 'SALE')">Sell</button>
+                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="deleteProduct(${p.id})">🗑️</button>
                 </td>
             </tr>
         `).join('');
@@ -219,6 +222,29 @@
             refreshAll();
         } else {
             alert("Error saving product.");
+        }
+    }
+
+    async function deleteProduct(id) {
+        if (confirm("Are you sure you want to delete this product? All transaction history for it will be lost.")) {
+            const response = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+            if (response.ok) refreshAll();
+        }
+    }
+
+    async function addNewCategory() {
+        const name = prompt("Enter new category name (e.g., Furniture):");
+        if (!name) return;
+
+        const response = await fetch('/api/categories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name })
+        });
+
+        if (response.ok) {
+            alert("Category added! Refresh the page to see it in the dropdown.");
+            location.reload(); // Quick way to refresh the category dropdown
         }
     }
 
