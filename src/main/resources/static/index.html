@@ -21,6 +21,7 @@
         <div class="mb-3 text-end">
             <a href="/api/products/export" class="btn btn-outline-success me-2">📊 Export to CSV</a>
             <button class="btn btn-outline-info me-2" onclick="addNewCategory()">+ New Category</button>
+            <button class="btn btn-outline-danger me-2" onclick="removeCategory()">- Delete Category</button>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">+ Add New Product</button>
         </div>
         <div class="row mb-4">
@@ -262,6 +263,33 @@
             refreshAll(); // This will refresh your dropdown automatically
         } else {
             alert("Error adding category.");
+        }
+    }
+
+    async function removeCategory() {
+        const id = prompt("Enter the Category ID to delete:");
+        if (!id) return;
+
+        try {
+            const response = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+
+            if (response.ok) {
+                alert("Category deleted successfully!");
+                refreshAll();
+            } else {
+                // We try to read the JSON, but catch it if it's not JSON
+                const errorData = await response.json().catch(() => ({}));
+
+                if (response.status === 404) {
+                    alert(`🔍 Not Found: The ID ${id} doesn't exist.`);
+                } else if (response.status === 400) {
+                    alert(`⚠️ Error: ${errorData.message || "This category is still in use by products."}`);
+                } else {
+                    alert("Unexpected Error: " + (errorData.message || "Something went wrong."));
+                }
+            }
+        } catch (err) {
+            alert("Connection error: Could not reach the server.");
         }
     }
 

@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.HashMap;
 import com.example.inventory.model.Category;
 import com.example.inventory.repository.CategoryRepository;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 @Service
 public class InventoryService {
@@ -122,5 +124,22 @@ public class InventoryService {
 
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
+    }
+
+    public void deleteCategory(Long id) {
+        // 1. Check if it exists
+        if (!categoryRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category ID " + id + " not found.");
+        }
+
+        // 2. Check if it's being used
+        boolean hasProducts = productRepository.findAll().stream()
+                .anyMatch(p -> p.getCategory().getId().equals(id));
+
+        if (hasProducts) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete: Products are still assigned to this category.");
+        }
+
+        categoryRepository.deleteById(id);
     }
 }

@@ -23,4 +23,9 @@ public class CategoryController {
     public List<Category> getAllCategories() {
         return inventoryService.getAllCategories();
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteCategory(@PathVariable Long id) {
+        inventoryService.deleteCategory(id);
+    }
 }
