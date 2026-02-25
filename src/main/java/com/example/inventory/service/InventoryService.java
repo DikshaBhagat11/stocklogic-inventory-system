@@ -119,4 +119,8 @@ public class InventoryService {
         });
         return csv.toString();
     }
+
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
+    }
 }

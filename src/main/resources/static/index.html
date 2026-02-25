@@ -106,8 +106,6 @@
                     <div class="mb-3">
                         <label class="form-label">Category ID</label>
                         <select id="newCategory" class="form-select">
-                            <option value="1">Electronics (ID: 1)</option>
-                            <option value="2">Office Supplies (ID: 2)</option>
                         </select>
                     </div>
                 </form>
@@ -126,7 +124,8 @@
     async function refreshAll() {
         await loadProducts();
         await loadTransactions();
-        await loadStats(); // Add this
+        await loadStats();
+        await loadCategories();
     }
 
     async function loadStats() {
@@ -177,6 +176,16 @@
                 <td class="text-muted small">${t.reason}</td>
             </tr>
         `).join('');
+    }
+
+    async function loadCategories() {
+        const response = await fetch('/api/categories');
+        const categories = await response.json();
+        const select = document.getElementById('newCategory');
+
+        select.innerHTML = categories.map(c => `
+        <option value="${c.id}">${c.name} (ID: ${c.id})</option>
+    `).join('');
     }
 
     async function handleUpdate(productId, type) {
