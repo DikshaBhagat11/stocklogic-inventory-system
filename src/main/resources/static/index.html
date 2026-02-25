@@ -245,15 +245,23 @@
         const name = prompt("Enter new category name (e.g., Furniture):");
         if (!name) return;
 
+        const description = prompt("Enter a brief description for this category:");
+        if (!description) return; // Or set a default like "No description provided"
+
         const response = await fetch('/api/categories', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: name })
+            body: JSON.stringify({
+                name: name,
+                description: description
+            })
         });
 
         if (response.ok) {
-            alert("Category added! Refresh the page to see it in the dropdown.");
-            location.reload(); // Quick way to refresh the category dropdown
+            alert("Category added successfully!");
+            refreshAll(); // This will refresh your dropdown automatically
+        } else {
+            alert("Error adding category.");
         }
     }
 
