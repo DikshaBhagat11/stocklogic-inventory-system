@@ -17,12 +17,15 @@
         <button class="btn btn-outline-secondary btn-sm" onclick="refreshAll()">🔄 Refresh All</button>
     </div>
 
-    <div class="card shadow">
         <div class="mb-3 text-end">
             <a href="/api/products/export" class="btn btn-outline-success me-2">📊 Export to CSV</a>
             <button class="btn btn-outline-info me-2" onclick="addNewCategory()">+ New Category</button>
             <button class="btn btn-outline-danger me-2" onclick="removeCategory()">- Delete Category</button>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">+ Add New Product</button>
+        </div>
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white text-center">
+            <h5 class="mb-0">Dashboard Stats</h5>
         </div>
         <div class="row mb-4">
             <div class="col-md-4">
@@ -50,6 +53,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="card shadow">
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <div class="input-group">
@@ -60,7 +65,7 @@
                 </div>
             </div>
         </div>
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-primary text-white text-center">
             <h5 class="mb-0">Current Inventory Status</h5>
         </div>
         <div class="card-body p-0">
@@ -135,10 +140,16 @@
     let allProducts = []; // This will hold our "master list" of products
 
     async function refreshAll() {
+        // Clear the search bar so the user sees ALL data again
+        document.getElementById('searchInput').value = '';
+
+        // Pull the fresh data
         await loadProducts();
         await loadTransactions();
         await loadStats();
         await loadCategories();
+
+        console.log("Dashboard synced with database.");
     }
 
     async function loadStats() {
